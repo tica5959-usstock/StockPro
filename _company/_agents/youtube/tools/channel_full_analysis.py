@@ -6,6 +6,12 @@ No additional config needed. Output: full report with stats, patterns, and
 data-driven recommendations.
 """
 import os, json, sys, time, datetime, statistics, re
+
+# Windows에서 이모지/한글 출력 시 UnicodeEncodeError 방지
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
 from collections import Counter
 
 HERE = os.path.dirname(os.path.abspath(__file__))

@@ -1,4 +1,11 @@
 import json
+import sys
+
+# Windows에서 이모지/한글 출력 시 UnicodeEncodeError 방지
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
 from typing import Dict, Any, List
 
 # ⚠️ 주의: 이 부분은 이전 세션에서 구축된 핵심 로직을 호출한다고 가정합니다.
