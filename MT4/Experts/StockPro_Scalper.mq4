@@ -140,6 +140,14 @@ input color   InpDashLossClr    = C'242,110,110';             // 손실 색
 input color   InpDashWarnClr    = C'240,180,80';              // 경고 색
 
 //+------------------------------------------------------------------+
+//| 입력변수 - 최적화 평가 (Strategy Tester "Custom max" 전용)         |
+//+------------------------------------------------------------------+
+input string  __s7__            = "===== 최적화 평가 =====";  // .
+input int     InpTesterMinTrades= 100;                        // 최소 거래 수 (미만이면 0점 = 탈락)
+input double  InpTesterMaxDDPct = 25.0;                       // 허용 최대 낙폭 % (초과 시 0점, 0=무제한)
+input double  InpTesterDDWeight = 1.0;                        // 낙폭 페널티 가중치 (0=페널티 없음)
+
+//+------------------------------------------------------------------+
 //| 전역 변수                                                         |
 //+------------------------------------------------------------------+
 string   g_prefix;                 // 오브젝트 이름 접두사
@@ -1274,6 +1282,92 @@ void SortByTime(datetime &t[], double &p[], int lo, int hi)
 datetime DayStart(datetime t)
 {
    return(t - (t % 86400));
+}
+
+//+------------------------------------------------------------------+
+//| 최적화 평가 함수 (Strategy Tester -> 최적화 기준 "Custom max")     |
+//|                                                                  |
+//| MT4 기본 기준인 "Balance max"는 총수익이 가장 큰 파라미터를 뽑기   |
+//| 때문에, 표본이 적고 운 좋게 큰 수익을 낸 과최적화 조합이 1등이 된다.|
+//| 여기서는 SQN(System Quality Number)을 사용한다.                   |
+//|                                                                  |
+//|     SQN = sqrt(N) x 평균손익 / 손익표준편차                       |
+//|                                                                  |
+//| - 거래당 기댓값을 변동성으로 나누므로 "운"이 아닌 "일관성"을 본다  |
+//| - 표본 수를 곱해 거래가 적은 조합에 점수를 주지 않는다             |
+//| - N은 100에서 상한을 둬서 거래수만 불려 점수를 키우는 것을 막는다  |
+//|                                                                  |
+//| SQN 해석 기준: 2.0 미만 = 평범, 2.0~3.0 = 양호, 3.0 이상 = 우수    |
+//| (단, 백테스트 SQN은 실거래보다 항상 부풀려진다는 점을 감안할 것)   |
+//+------------------------------------------------------------------+
+double OnTester()
+{
+   int histTotal = OrdersHistoryTotal();
+
+   double profits[];
+   ArrayResize(profits, histTotal);
+   int n = 0;
+
+   for(int i = 0; i < histTotal; i++)
+   {
+      if(!OrderSelect(i, SELECT_BY_POS, MODE_HISTORY)) continue;
+      if(OrderMagicNumber() != InpMagicNumber)         continue;
+      if(OrderType() != OP_BUY && OrderType() != OP_SELL) continue;
+
+      profits[n] = OrderProfit() + OrderSwap() + OrderCommission();
+      n++;
+   }
+   ArrayResize(profits, n);
+
+   // --- 탈락 조건 ---
+   // 표본이 적으면 통계적으로 무의미하므로 아예 0점 처리한다.
+   if(n < InpTesterMinTrades) return(0.0);
+
+   double net = 0.0;
+   for(int i = 0; i < n; i++) net += profits[i];
+   if(net <= 0.0) return(0.0);
+
+   // 손익 곡선 최대 낙폭 (금액/%)
+   double running = 0.0, peak = 0.0, maxDD = 0.0;
+   for(int i = 0; i < n; i++)
+   {
+      running += profits[i];
+      if(running > peak) peak = running;
+      double dd = peak - running;
+      if(dd > maxDD) maxDD = dd;
+   }
+
+   double initialDeposit = AccountBalance() - net;
+   double maxDDPct = (initialDeposit > 0.0) ? (maxDD / initialDeposit * 100.0) : 0.0;
+
+   if(InpTesterMaxDDPct > 0.0 && maxDDPct > InpTesterMaxDDPct) return(0.0);
+
+   // --- SQN 계산 ---
+   double mean = net / n;
+
+   double varSum = 0.0;
+   for(int i = 0; i < n; i++)
+   {
+      double d = profits[i] - mean;
+      varSum += d * d;
+   }
+   if(n < 2) return(0.0);
+
+   double sd = MathSqrt(varSum / (n - 1));
+   if(sd <= 0.0) return(0.0);
+
+   double effN = MathMin((double)n, 100.0);   // 표본수 상한
+   double sqn  = MathSqrt(effN) * mean / sd;
+
+   if(sqn <= 0.0) return(0.0);
+
+   // --- 낙폭 페널티 ---
+   // 같은 SQN이면 낙폭이 얕은 조합을 선호한다.
+   double score = sqn;
+   if(InpTesterDDWeight > 0.0)
+      score = sqn / (1.0 + InpTesterDDWeight * (maxDDPct / 100.0));
+
+   return(score);
 }
 
 //+------------------------------------------------------------------+
