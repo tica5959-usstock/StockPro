@@ -1,0 +1,58 @@
+; StockPro_Scalper - USDJPY# 프리셋
+; USDJPY는 금 대비 노이즈가 작고 세션 추세성이 좋아 손절을 조이고 R:R을 크게 가져간다.
+; MT4: EA 설정창 -> [불러오기] -> 이 파일 선택
+InpMagicNumber=20260802
+InpOrderComment=SP_UJ
+InpSlippage=20
+InpEnableTrading=1
+
+; --- 진입 신호 ---
+InpTrendTF=60
+InpEmaFast=50
+InpEmaSlow=200
+InpUseAdx=1
+InpAdxPeriod=14
+InpAdxMin=20.0
+InpEntryTF=5
+InpOscType=0
+InpSignalOnBarClose=1
+InpRsiPeriod=14
+InpRsiBuyLevel=40.0
+InpRsiSellLevel=60.0
+
+; --- 리스크 ---
+InpLotMode=0
+InpRiskPercent=0.5
+InpFixedLot=0.01
+InpAllowMinLotUp=0
+InpAtrPeriod=14
+InpAtrTF=15
+InpSlAtrMult=1.3
+InpTpRR=1.7
+InpMaxPositions=1
+InpDailyLossPct=3.0
+InpDailyProfitPct=0.0
+InpMaxConsecLoss=4
+InpCooldownMin=60
+
+; --- 청산 ---
+InpExitMode=2
+InpUseBreakeven=1
+InpBeTriggerR=0.6
+InpBeOffsetPoints=15
+InpTrailAtrMult=1.2
+InpTrailStepPoints=40
+InpTrailStartR=1.0
+InpPartialPct=60.0
+InpPartialTriggerR=1.0
+InpRunnerClearTP=1
+
+; --- 필터 ---
+InpMaxSpreadPts=0
+InpMaxSpreadAtrR=0.10
+InpUseSessionFilt=1
+InpSessionStartHr=8
+InpSessionEndHr=21
+InpUseFridayStop=1
+InpFridayStopHr=19
+InpMinBarsBetween=2
