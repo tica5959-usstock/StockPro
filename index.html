@@ -1321,8 +1321,9 @@ function renderChartBar() {
   $('cbZoom').textContent = (T.ci + 1 < clampBars(state.bars) ? (T.ci + 1) : clampBars(state.bars)) + '봉';
 
   const zIn = $('btnZoomIn'), zOut = $('btnZoomOut');
-  if (zIn) zIn.disabled = (state.bars <= MIN_BARS);
-  if (zOut) zOut.disabled = (state.bars >= MAX_BARS);
+  const few = (T.ci + 1 <= MIN_BARS);      // 연봉처럼 봉이 20개 미만이면 줌할 것이 없다
+  if (zIn) zIn.disabled = few || (state.bars <= MIN_BARS);
+  if (zOut) zOut.disabled = few || (state.bars >= MAX_BARS);
 
   const bl = $('btnLatest');
   if (bl) bl.disabled = (state.pan <= 0.5);
