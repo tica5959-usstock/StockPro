@@ -1175,7 +1175,7 @@ function draw() {
     ctx.save(); ctx.setLineDash([2, 4]); ctx.strokeStyle = '#7d8a9e'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(sx, padT + 10); ctx.lineTo(sx, volT + volH); ctx.stroke(); ctx.restore();
     ctx.fillStyle = '#9aa8bc'; ctx.textAlign = 'center'; ctx.font = '10px -apple-system,sans-serif';
-    ctx.fillText('시작', Math.max(padL + 10, Math.min(padL + plotW - 10, sx)), volT + volH - 3);
+    ctx.fillText('시작', Math.max(padL + 10, Math.min(padL + plotW - 10, sx)), padT + 21);
     ctx.fillStyle = '#6d7a8c'; ctx.textAlign = 'left';
   }
 
