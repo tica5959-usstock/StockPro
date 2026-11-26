@@ -923,10 +923,10 @@ function clampBars(v) {
 
 /* ================= 타임프레임(일/주/월/연) ================= */
 const TFS = [
-  { k: 'D', label: '일', unit: '일' },
-  { k: 'W', label: '주', unit: '주' },
-  { k: 'M', label: '월', unit: '월' },
-  { k: 'Y', label: '연', unit: '년' }
+  { k: 'D', label: '일', unit: '일', bar: '일봉' },
+  { k: 'W', label: '주', unit: '주', bar: '주봉' },
+  { k: 'M', label: '월', unit: '개월', bar: '월봉' },
+  { k: 'Y', label: '연', unit: '년', bar: '연봉' }
 ];
 
 function r2(v) { return Math.round(v * 100) / 100; }
@@ -1300,6 +1300,10 @@ function tfUnit() {
   for (let i = 0; i < TFS.length; i++) if (TFS[i].k === state.tf) return TFS[i].unit;
   return '일';
 }
+function tfBarName() {
+  for (let i = 0; i < TFS.length; i++) if (TFS[i].k === state.tf) return TFS[i].bar;
+  return '일봉';
+}
 
 function renderChartBar() {
   const scn = cur();
@@ -1348,8 +1352,8 @@ function showTip(ev) {
   const prev = bars[i - 1];
   const ch = prev ? (b[4] / prev[4] - 1) : null;
   const u = tfUnit();
-  let html = '<div class="r"><span>' + b[0] + '</span><span>' + u + '봉</span></div>';
-  if (u !== '일') html += '<div class="r"><span>기간</span><span>' + String(b[13]).slice(5) + ' ~ ' + b[0].slice(5) + '</span></div>';
+  let html = '<div class="r"><span>' + b[0] + '</span><span>' + tfBarName() + '</span></div>';
+  if (state.tf !== 'D') html += '<div class="r"><span>기간</span><span>' + String(b[13]).slice(5) + ' ~ ' + b[0].slice(5) + '</span></div>';
   if (geom.dIdx >= 0) html += '<div class="r"><span>기준일 대비</span><span>' + ddayTxt(i - geom.dIdx) + '</span></div>';
   html += '<div class="r"><span>시가</span><span>' + fmt(b[1]) + '</span></div>' +
     '<div class="r"><span>고가</span><span>' + fmt(b[2]) + '</span></div>' +
