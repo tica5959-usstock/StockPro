@@ -1587,7 +1587,6 @@ function applyStartDate() {
 
 /* ================= 크로스헤어 ================= */
 const tip = $('tip');
-let tipIdx = -1;          // 지금 툴팁이 가리키는 봉
 let tipTapIdx = -1;       // 마지막으로 탭한 봉 — [이 날부터 시작] 버튼의 대상
 function showTip(ev, tapped) {
   if (!geom) return;
@@ -1598,7 +1597,6 @@ function showTip(ev, tapped) {
   const i = Math.round(idxF);
   if (i < geom.i0 || i > geom.ci) { hideTip(); return; }
   const b = bars[i];
-  tipIdx = i;
   if (tapped) tipTapIdx = i;
   const prev = bars[i - 1];
   const ch = prev ? (b[4] / prev[4] - 1) : null;
@@ -1635,7 +1633,7 @@ function showTip(ev, tapped) {
   ctx.beginPath(); ctx.moveTo(geom.X(i), geom.padT); ctx.lineTo(geom.X(i), geom.volT + geom.volH); ctx.stroke();
   ctx.restore();
 }
-function hideTip() { tip.style.display = 'none'; tipIdx = -1; tipTapIdx = -1; hideTipStart(); }
+function hideTip() { tip.style.display = 'none'; tipTapIdx = -1; hideTipStart(); }
 
 /* ================= 툴팁의 [YY-MM-DD부터 시작] =================
    일봉에서 과거 봉을 탭하면 그 봉 날짜로 시작일을 바로 옮긴다.
