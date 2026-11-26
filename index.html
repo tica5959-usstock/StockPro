@@ -1631,7 +1631,10 @@ function showTip(ev) {
   ctx.beginPath(); ctx.moveTo(geom.X(i), geom.padT); ctx.lineTo(geom.X(i), geom.volT + geom.volH); ctx.stroke();
   ctx.restore();
 }
-function hideTip() { tip.style.display = 'none'; hideTipStart(); }
+function hideTip() { tip.style.display = 'none'; hideTipStart(); tipPinned = false; }
+/* 탭으로 고른 봉의 툴팁은 그 자리에 고정한다(마우스를 옮겨 [이 날부터 시작]을 누를 수 있게).
+   다른 봉을 누르거나 차트를 밀면 풀린다. */
+let tipPinned = false;
 
 /* ================= 툴팁의 [YY-MM-DD부터 시작] =================
    일봉에서 과거 봉을 탭하면 그 봉 날짜로 시작일을 바로 옮긴다.
@@ -1804,6 +1807,7 @@ function onPointerDown(e) {
   }
   if (pinch) return;
   pinchUsed = false;
+  tipPinned = false;
   const p = { x: e.clientX || 0, y: e.clientY || 0 };
   drag = { x: p.x, y: p.y, pan: state.pan, moved: false, id: id, type: e.pointerType || 'mouse' };
   if (drag.type !== 'mouse') hideTip();
@@ -1820,7 +1824,7 @@ function onPointerMove(e) {
   }
   const p = { x: e.clientX || 0, y: e.clientY || 0 };
   if (!drag) {
-    if ((e.pointerType || 'mouse') === 'mouse') showTip(e);
+    if ((e.pointerType || 'mouse') === 'mouse' && !tipPinned) showTip(e);
     return;
   }
   const dx = p.x - drag.x, dy = p.y - drag.y;
@@ -1847,7 +1851,7 @@ function onPointerUp(e) {
   if (!drag) return;
   const d = drag;
   drag = null;
-  if (!d.moved && !pinchUsed) { showTip(e); return; }
+  if (!d.moved && !pinchUsed) { showTip(e); tipPinned = true; return; }
   state.pan = Math.round(state.pan);
   hideTip();
   draw();
