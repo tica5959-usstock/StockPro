@@ -787,7 +787,7 @@ function renderList() {
         sub = (rec.tech || '미지정') + ' · +' + rec.tp + '% / -' + rec.sl + '% · ' + rec.held + '일';
       }
     } else {
-      sub = '종산 ' + ST[s.stance];
+      sub = (s.basis === 'chart' ? '차트 ' : '종산 ') + ST[s.stance];
     }
     b.innerHTML = '<span class="it"><span class="num">' + no + '</span><span class="nm">' + s.name + '</span>' + kd +
       '<br><span class="sub">' + s.d + ' · ' + sub + '</span></span>' + badge;
