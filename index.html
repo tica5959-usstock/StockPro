@@ -222,6 +222,19 @@ table.rt .sub{font-size:9.5px;color:#6d7a8c;font-weight:400}
 .tagres.manual{color:#ffd166;border-color:#5a4a1e;background:#221c10}
 .tagres.end{color:#cfd6e2}
 .tagres.pass{color:#cfd6e2}
+/* 종산 원본 차트 모달 */
+#originBody figure{margin:0 0 10px}
+#originBody img{width:100%;height:auto;border-radius:10px;border:1px solid var(--line);display:block;background:#0b0e13}
+#originBody figcaption{font-size:10.5px;color:var(--mut);margin-top:4px}
+#originBody figure.bad img{display:none}
+#originBody figure.bad::after{content:'이미지를 불러오지 못했습니다 — 원문 블로그에서 확인해 주세요';display:block;padding:20px 12px;
+  border:1px dashed #6b4a16;border-radius:10px;color:#ffd08a;font-size:12px;text-align:center;background:#1a1409}
+#originBody .otext{white-space:pre-wrap;font-size:12px;color:#cfd9e8;background:#101826;border-left:3px solid #3a5c94;
+  padding:8px 10px;border-radius:0 8px 8px 0;margin-top:10px}
+.ofoot{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap}
+.ofoot a{font-size:12px}
+.omiss{display:none;margin:0 0 10px;padding:8px 10px;border-radius:9px;border:1px solid #6b4a16;background:#221a10;color:#ffd08a;font-size:11.5px}
+.tbox{margin-top:10px}
 </style>
 </head>
 <body>
@@ -307,14 +320,15 @@ table.rt .sub{font-size:9.5px;color:#6d7a8c;font-weight:400}
 
         <div class="rules">
           <b>모의 규칙</b> · 진입 <b>내가 고른 날 종가</b> · 익절·손절은 <b>매수할 때 함께 설정</b> ·
-          +1일마다 <b>장중 고가/저가</b>로 판정 · 같은 봉에서 겹치면 <b>손절 우선</b> · 패스 수익 0%
+          +1일마다 <b>장중 고가/저가</b>로 판정 · 같은 봉에서 겹치면 <b>손절 우선</b> · 패스 수익 0% ·
+          한 종목에서 청산 후 <b>연속 재매수</b> 가능
         </div>
 
         <div class="hint" id="hint">기준일 2거래일 전부터 시작합니다. 차트를 좌우로 밀어 과거를 보고, <b>+1일</b>로 하루씩 넘기다가 원하는 날 <b>이 날 매수</b>를 누르세요.</div>
 
         <div class="decide" id="decide">
           <button class="dbtn buy" id="btnBuy">
-            <span class="t">이 날 매수</span>
+            <span class="t" id="buyLbl">이 날 매수</span>
             <span class="d" id="buySub">이 날 종가로 진입 — 익절·손절 함께 설정</span>
           </button>
           <button class="dbtn pass" id="btnPass">
@@ -351,6 +365,7 @@ table.rt .sub{font-size:9.5px;color:#6d7a8c;font-weight:400}
           <button id="btnStep" class="ghost">+1일</button>
           <button id="btnSell" class="ghost" style="display:none">이 날 매도</button>
           <button id="btnAll" class="ghost">결과 바로 보기</button>
+          <button id="btnOrigin" class="ghost" style="display:none" title="종산 블로그 원본 차트와 본문 보기">종산 원본 차트 보기</button>
           <span class="sp"></span>
           <button id="btnRetry" class="ghost">다시 풀기</button>
           <button id="btnNext" class="primary">다음 문제 →</button>
@@ -381,6 +396,8 @@ table.rt .sub{font-size:9.5px;color:#6d7a8c;font-weight:400}
       <li><b>매수 확정</b>을 누르면 차트에 <b>진입가(노랑 점선)·익절(빨강 점선)·손절(파랑 점선)</b>이 그려지고, 매수한 봉에 <b>▲B</b>, 청산된 봉에 <b>●S</b> 마커가 붙습니다.</li>
       <li><b>+1일</b>을 누를 때마다 장중 <b>고가/저가</b>로 익절·손절 도달을 판정합니다. 같은 봉에서 둘 다 닿으면 <b>손절 우선</b>입니다.</li>
       <li>보유 중이면 <b>이 날 매도</b>로 그 봉 종가에 직접 청산할 수 있습니다.</li>
+      <li>청산되고 나면 같은 문제에서 <b>이 날 다시 매수</b>로 이어서 매매할 수 있습니다. 청산한 날 종가로 바로 다시 사거나 <b>+1일</b>로 다음 날을 열어 사면 되고, 차트에는 매매마다 <b>▲B·●S</b>가 찍히고 결과 영역에 <b>#1 #2 … 매매 내역과 합산 손익</b>이 쌓입니다. 매매결과 리포트도 모든 매매를 합산합니다. 시작일을 되돌릴 필요 없이 하루씩 넘기며 여러 번 매매해 보세요.</li>
+      <li><b>종산 원본 차트 보기</b> 버튼을 누르면 그 종목을 다룬 종산 매매일지의 <b>원본 차트 이미지와 본문 발췌</b>가 크게 열립니다. 스포일러를 피하려고 평소엔 보이지 않고, 버튼을 눌러야 열립니다. 블로그 원문 링크도 함께 있습니다.</li>
       <li>매수 없이 <b>패스(관망)</b>를 누르면 이후 흐름(기회비용)을 봅니다.</li>
       <li><b>결과 바로 보기</b>는 남은 봉을 모두 열고 결과를 보여줍니다.</li>
       <li><b>매매결과</b> 버튼을 누르면 1회 투자금을 기준으로 <b>승/패·수익금액·수익률</b>을 기법별·종목별로 취합해 보여줍니다.</li>
@@ -418,6 +435,18 @@ table.rt .sub{font-size:9.5px;color:#6d7a8c;font-weight:400}
     </div>
     <div id="repBody"></div>
     <div style="text-align:right;margin-top:12px"><button id="repClose">닫기</button></div>
+  </div>
+</div>
+
+<div class="modal" id="originModal">
+  <div class="inner wide">
+    <h3 id="originTitle">종산 원본 차트</h3>
+    <div class="omiss" id="originFail"><b>이미지를 불러오지 못했습니다.</b> 아래 <b>원문 블로그</b>에서 차트를 확인해 주세요.</div>
+    <div id="originBody"></div>
+    <div class="ofoot">
+      <a id="originLink" href="https://blog.naver.com/kokomo6661" target="_blank" rel="noopener">원문 블로그에서 보기 →</a>
+      <button id="originClose">닫기</button>
+    </div>
   </div>
 </div>
 
@@ -475,7 +504,9 @@ const state = {
   records: {},
   starts: {},           // 문제 id → 사용자가 고른 시작 봉 인덱스
   prefs: { tp: DEF_TP, sl: DEF_SL },
-  restored: false
+  restored: false,
+  recorded: false,      // 지금 포지션을 이미 기록했는지 (한 포지션 = 한 매매)
+  lastClosed: null      // 방금 청산한(또는 복원한 마지막) 매매 — 결과 영역에 그대로 보여 준다
 };
 
 function $(id) { return document.getElementById(id); }
@@ -678,7 +709,79 @@ function live(hidePreview) {
   return replay(scn, 'buy', state.tp, state.sl, ci, ci, null);
 }
 
-/* ================= 기록 ================= */
+/* ================= 기록 (한 문제에서 여러 번 매매) =================
+   records[id] 는 예전 형식 그대로 맨 위에 매매 1건의 필드를 두고(하위 호환),
+   실제 매매들은 records[id].trades 배열에 차례로 쌓는다.
+   예전에 저장된 단일 매매 객체는 그 자체를 1건짜리 trades 로 읽으므로 그대로 살아난다. */
+const TRADE_FIELDS = ['decision', 'tech', 'tp', 'sl', 'startIdx', 'entry', 'entryIdx', 'entryDate',
+  'sellIdx', 'exit', 'exitIdx', 'exitDate', 'ret', 'held', 'reason', 'kind', 'mfe', 'mae', 'opp',
+  'revealed', 'lastClose', 'ts'];
+
+function recTrades(rec) {
+  if (!rec) return [];
+  if (Object.prototype.toString.call(rec.trades) === '[object Array]') return rec.trades;
+  return [rec];
+}
+function recLastTrade(rec) { const a = recTrades(rec); return a.length ? a[a.length - 1] : null; }
+function curTrades() { return recTrades(state.records[cur().id]); }
+function tradeCum(rec) {
+  let c = 1, n = 0, total = 0;
+  recTrades(rec).forEach(function (t) {
+    total++;
+    if (t.decision === 'buy') { c *= (1 + (t.ret || 0)); n++; }
+  });
+  return { cum: n ? c - 1 : null, buys: n, n: total };
+}
+function pickTrade(o) {
+  const t = {};
+  TRADE_FIELDS.forEach(function (k) { if (o[k] !== undefined) t[k] = o[k]; });
+  return t;
+}
+/* 이 문제에서 다시 살 수 있는 가장 이른 봉 — 직전 매매를 청산한 봉 '당일' 종가 재매수도 허용한다. */
+function nextBuyFloor() {
+  const t = recLastTrade(state.records[cur().id]);
+  if (!t) return -1;
+  if (t.exitIdx != null) return t.exitIdx;
+  if (t.entryIdx != null) return t.entryIdx;
+  return -1;
+}
+/* 매매 목록을 records[id] 에 써넣는다 (예전 형식 = 첫 매매를 맨 위에 복사). */
+function commitTrades(list, prevTs) {
+  const id = cur().id;
+  const rec = pickTrade(list[0]);
+  if (rec.startIdx == null) rec.startIdx = startIdxOf(cur());
+  rec.ts = prevTs || (list[0] && list[0].ts) || Date.now();
+  let anyBuy = false;
+  list.forEach(function (x) { if (x.decision === 'buy') anyBuy = true; });
+  rec.decision = anyBuy ? 'buy' : 'pass';
+  rec.trades = list;
+  state.records[id] = rec;
+  save();
+  refreshStats();
+  renderList();
+}
+/* 매매 1건을 records[id].trades 끝에 붙인다 (예전 단일 형식이면 배열로 승격). */
+function addTrade(t) {
+  const prev = state.records[cur().id];
+  const list = recTrades(prev).map(function (x) { return pickTrade(x); });
+  const nt = pickTrade(t);
+  nt.ts = nt.ts || Date.now();
+  list.push(nt);
+  commitTrades(list, prev && prev.ts);
+  return nt;
+}
+/* 마지막 매매를 같은 자리에서 갱신한다 (관망 기록의 이후 흐름 갱신용) */
+function replaceLastTrade(t) {
+  const prev = state.records[cur().id];
+  const list = recTrades(prev).map(function (x) { return pickTrade(x); });
+  if (!list.length) return addTrade(t);
+  const nt = pickTrade(t);
+  nt.ts = list[list.length - 1].ts || nt.ts || Date.now();
+  list[list.length - 1] = nt;
+  commitTrades(list, prev && prev.ts);
+  return nt;
+}
+
 function maybeRecord() {
   if (!state.decision) return false;
   const scn = cur();
@@ -687,8 +790,7 @@ function maybeRecord() {
   const r = replay(scn, state.decision, state.tp, state.sl, ci, ei, state.sellIdx);
   const ready = (state.decision === 'pass') ? true : (r.exit != null);
   if (!ready) return false;
-  const prev = state.records[scn.id];
-  state.records[scn.id] = {
+  const t = {
     decision: state.decision,
     tech: state.tech,
     tp: state.tp,
@@ -708,11 +810,29 @@ function maybeRecord() {
     mfe: r.mfe,
     mae: r.mae,
     opp: r.opp,
-    ts: (prev && prev.ts) || Date.now()
+    revealed: r.revealed,
+    lastClose: r.lastClose,
+    ts: Date.now()
   };
-  save();
-  refreshStats();
-  renderList();
+  if (state.decision === 'pass') {
+    // 관망은 +1일마다 이후 흐름(기회비용)만 갱신한다 — 같은 기록을 덮어쓴다
+    const lastT = recLastTrade(state.records[scn.id]);
+    if (lastT && lastT.decision === 'pass' && lastT.entryIdx === r.entryIdx) state.lastClosed = replaceLastTrade(t);
+    else state.lastClosed = addTrade(t);
+    state.recorded = true;
+    return true;
+  }
+  if (state.recorded) return false;            // 같은 포지션을 두 번 기록하지 않는다
+  state.recorded = true;
+  state.lastClosed = addTrade(t);
+  return true;
+}
+/* 보유 포지션이 청산됐으면 기록하고, 곧바로 다시 살 수 있는 상태(포지션 없음)로 돌린다. */
+function finishTrade() {
+  if (!maybeRecord()) return false;
+  state.decision = null;
+  state.buyIdx = null;
+  state.sellIdx = null;
   return true;
 }
 
@@ -724,18 +844,24 @@ function stats() {
     const rec = state.records[s.id];
     if (!rec) return;
     done++;
-    if (rec.decision !== 'buy') { passes++; return; }
-    buys++;
-    if (rec.ret > 0) wins++;
-    cum *= (1 + rec.ret);
-    const k = rec.tech || '미지정';
-    const t = byTech[k] || (byTech[k] = { n: 0, w: 0, cum: 1, sum: 0, best: -9, worst: 9 });
-    t.n++;
-    if (rec.ret > 0) t.w++;
-    t.cum *= (1 + rec.ret);
-    t.sum += rec.ret;
-    t.best = Math.max(t.best, rec.ret);
-    t.worst = Math.min(t.worst, rec.ret);
+    const trs = recTrades(rec);
+    let hasBuy = false;
+    trs.forEach(function (t) {
+      if (t.decision !== 'buy') return;
+      hasBuy = true;
+      buys++;
+      if (t.ret > 0) wins++;
+      cum *= (1 + (t.ret || 0));
+      const k = t.tech || '미지정';
+      const g = byTech[k] || (byTech[k] = { n: 0, w: 0, cum: 1, sum: 0, best: -9, worst: 9 });
+      g.n++;
+      if (t.ret > 0) g.w++;
+      g.cum *= (1 + (t.ret || 0));
+      g.sum += (t.ret || 0);
+      g.best = Math.max(g.best, t.ret || 0);
+      g.worst = Math.min(g.worst, t.ret || 0);
+    });
+    if (!hasBuy) passes++;
   });
   return {
     done: done, total: DATA.length, buys: buys, wins: wins, passes: passes,
@@ -764,7 +890,9 @@ function filtered() {
     if (state.filter === 'buy') return !!(rec && rec.decision === 'buy');
     if (state.filter.indexOf('tech:') === 0) {
       const t = state.filter.slice(5);
-      return !!(rec && rec.decision === 'buy' && (rec.tech || '미지정') === t);
+      return !!(rec && rec.decision === 'buy' && recTrades(rec).some(function (x) {
+        return x.decision === 'buy' && (x.tech || '미지정') === t;
+      }));
     }
     return true;
   });
@@ -787,12 +915,15 @@ function renderList() {
     const kd = s.kind === 'scan' ? '<span class="kind scan">SCAN</span>' : '';
     let badge = '', sub;
     if (rec) {
-      if (rec.decision === 'pass') {
+      const trs = recTrades(rec);
+      const cu = tradeCum(rec);
+      if (!cu.buys) {
         badge = '<span class="st pass">관망</span>';
         sub = '관망 · 이후 ' + sp(rec.opp);
       } else {
-        badge = '<span class="st ' + (rec.ret > 0 ? 'win' : (rec.ret < 0 ? 'lose' : '')) + '">' + sp(rec.ret) + '</span>';
-        sub = (rec.tech || '미지정') + ' · +' + rec.tp + '% / -' + rec.sl + '% · ' + rec.held + '일';
+        const last = trs[trs.length - 1];
+        badge = '<span class="st ' + (cu.cum > 0 ? 'win' : (cu.cum < 0 ? 'lose' : '')) + '">' + sp(cu.cum) + '</span>';
+        sub = (cu.n > 1 ? '매매 ' + cu.n + '회 · ' : '') + (last.tech || '미지정') + ' · +' + last.tp + '% / -' + last.sl + '% · ' + last.held + '일';
       }
     } else {
       sub = (s.basis === 'chart' ? '차트 ' : '종산 ') + ST[s.stance];
@@ -844,35 +975,40 @@ function wonS(v) {
   return (n > 0 ? '+' : (n < 0 ? '-' : '')) + Math.abs(n).toLocaleString('ko-KR') + '원';
 }
 
-/* 완료된 기록을 한 줄씩 정리 (차트 데이터를 받아 오지 않아도 기록만으로 집계) */
+/* 완료된 기록을 한 줄씩 정리 (차트 데이터를 받아 오지 않아도 기록만으로 집계)
+   한 문제에서 여러 번 매매했으면 매매 건마다 한 줄씩 만든다. */
 function reportRows() {
   const rows = [];
   DATA.forEach(function (s) {
     const rec = state.records[s.id];
     if (!rec) return;
-    const isBuy = rec.decision === 'buy';
-    let bar = null;
-    if (s.bars && s.bars.length) {
-      const ei = (rec.entryIdx == null) ? s.dIndex : rec.entryIdx;
-      bar = s.bars[Math.max(0, Math.min(s.bars.length - 1, ei))];
-    }
-    const entry = (rec.entry != null) ? rec.entry : (bar ? bar[4] : null);
-    rows.push({
-      id: s.id, name: s.name, code: s.code,
-      decision: rec.decision,
-      tech: rec.tech || '미지정',
-      entryDate: rec.entryDate || (bar ? bar[0] : s.d),
-      entry: entry,
-      exitDate: rec.exitDate || '',
-      exit: rec.exit,
-      ret: isBuy ? (rec.ret || 0) : 0,
-      held: rec.held || 0,
-      kind: isBuy ? (rec.kind || '') : 'pass',
-      opp: rec.opp || 0
+    const trs = recTrades(rec);
+    trs.forEach(function (t, i) {
+      const isBuy = t.decision === 'buy';
+      let bar = null;
+      if (s.bars && s.bars.length) {
+        const ei = (t.entryIdx == null) ? s.dIndex : t.entryIdx;
+        bar = s.bars[Math.max(0, Math.min(s.bars.length - 1, ei))];
+      }
+      const entry = (t.entry != null) ? t.entry : (bar ? bar[4] : null);
+      rows.push({
+        id: s.id, name: s.name, code: s.code,
+        no: i + 1, n: trs.length,
+        decision: t.decision,
+        tech: t.tech || '미지정',
+        entryDate: t.entryDate || (bar ? bar[0] : s.d),
+        entry: entry,
+        exitDate: t.exitDate || '',
+        exit: t.exit,
+        ret: isBuy ? (t.ret || 0) : 0,
+        held: t.held || 0,
+        kind: isBuy ? (t.kind || '') : 'pass',
+        opp: t.opp || 0
+      });
     });
   });
   rows.sort(function (a, b) {
-    if (a.entryDate === b.entryDate) return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
+    if (a.entryDate === b.entryDate) return (a.name === b.name) ? (a.no - b.no) : (a.name < b.name ? -1 : 1);
     return a.entryDate < b.entryDate ? -1 : 1;
   });
   return rows;
@@ -933,7 +1069,7 @@ const KIND_LABEL = { tp: '익절', sl: '손절', manual: '수동매도', end: '�
 
 function tradeTable(sm, cap) {
   if (!sm.rows.length) return '<p class="meta2">아직 완료한 문제가 없습니다. 차트를 보고 매수·패스를 하면 여기에 쌓입니다.</p>';
-  let h = '<div class="tw"><table class="rt"><tr><th>종목</th><th>기법</th><th>매수 → 청산</th><th>가격</th><th>수익률</th><th>수익금액</th><th>결과</th></tr>';
+  let h = '<div class="tw"><table class="rt"><tr><th>종목</th><th>#</th><th>기법</th><th>매수 → 청산</th><th>가격</th><th>수익률</th><th>수익금액</th><th>결과</th></tr>';
   sm.rows.forEach(function (r) {
     const isBuy = r.decision === 'buy';
     const when = isBuy
@@ -948,6 +1084,7 @@ function tradeTable(sm, cap) {
     const res = '<span class="tagres ' + (isBuy ? r.kind : 'pass') + '">' + k + '</span>' +
       (isBuy ? '' : ' <span class="sub">이후 ' + sp(r.opp) + '</span>');
     h += '<tr><td class="nm">' + r.name + ' <span class="sub">' + r.code + '</span></td>' +
+      '<td>' + (r.n > 1 ? '<b>#' + r.no + '</b>' : '-') + '</td>' +
       '<td>' + (isBuy ? r.tech : '-') + '</td><td>' + when + '</td><td>' + price + '</td>' +
       '<td>' + ret + '</td><td>' + pf + '</td><td>' + res + '</td></tr>';
   });
@@ -960,9 +1097,10 @@ function renderReportBody() {
   if (!el) return;
   const cap = state.capital || DEF_CAP;
   const sm = reportSummary(cap);
+  const nProb = Object.keys(state.records).length;
   const cards =
     '<div class="rcard"><div class="k">완료</div><div class="v">' + sm.rows.length + '건</div>' +
-      '<div class="s">매수 ' + sm.buys.length + ' · 관망 ' + sm.passes.length + '</div></div>' +
+      '<div class="s">문제 ' + nProb + '개 · 매수 ' + sm.buys.length + ' · 관망 ' + sm.passes.length + '</div></div>' +
     '<div class="rcard"><div class="k">승 / 패</div><div class="v"><span class="pos">' + sm.wins.length + '</span> / <span class="neg">' + sm.losses.length + '</span></div>' +
       '<div class="s">승률 ' + (sm.wr == null ? '-' : Math.round(sm.wr * 100) + '%') + '</div></div>' +
     '<div class="rcard"><div class="k">총 수익금액</div><div class="v ' + cls(sm.profit) + '">' + wonS(sm.profit) + '</div>' +
@@ -1007,7 +1145,7 @@ function openReport() {
   const cap = state.capital || DEF_CAP;
   const sm = reportSummary(cap);
   const head = $('repHead');
-  if (head) head.textContent = '완료 ' + sm.rows.length + '문제 · 매수 ' + sm.buys.length + ' · 관망 ' + sm.passes.length +
+  if (head) head.textContent = '완료 ' + sm.rows.length + '건(문제 ' + Object.keys(state.records).length + '개) · 매수 ' + sm.buys.length + ' · 관망 ' + sm.passes.length +
     ' — 종산 참고 판단과 비교하기 전에 내 매매만 모아 본 성적입니다.';
   const inp = $('capInput');
   if (inp) inp.value = String(cap);
@@ -1158,6 +1296,28 @@ function view() {
   return { ci: ci, i0: i0, rEdge: rEdge, n: rEdge - i0 + 1, panMax: panMax };
 }
 
+/* 차트에 찍을 매매 마커 목록 — 기록된 매매들 + 지금 보유 중인 포지션 */
+function tradeMarks(vb) {
+  const out = [];
+  curTrades().forEach(function (t, qi) {
+    if (t.decision !== 'buy') return;
+    out.push({
+      no: qi + 1, entry: t.entry, entryTf: tfIndexOf(vb, t.entryDate),
+      exit: t.exit, kind: t.kind, ret: t.ret,
+      exitTf: t.exitDate ? tfIndexOf(vb, t.exitDate) : -1
+    });
+  });
+  if (state.decision === 'buy') {
+    const pos = live();
+    out.push({
+      no: out.length + 1, entry: pos.entry, entryTf: tfIndexOf(vb, pos.entryDate),
+      exit: pos.exit, kind: pos.kind, ret: pos.ret,
+      exitTf: (pos.exit != null) ? tfIndexOf(vb, pos.exitDate) : -1
+    });
+  }
+  return out;
+}
+
 function draw() {
   const scn = cur();
   if (!loaded(scn)) return;
@@ -1267,6 +1427,16 @@ function draw() {
     if (state.decision === 'pass') {
       hline(entryP, '#7d8a9e', [3, 3], '관망 ' + md(pos.entryDate) + ' ' + fmt(entryP), 0.8);
     }
+  } else if (state.lastClosed && !state.panel) {
+    // 방금(또는 복원한 마지막) 매매의 진입·익절·손절선은 흐리게 남긴다
+    const lc = state.lastClosed;
+    const n = curTrades().length;
+    if (lc.decision === 'buy' && isFinite(lc.entry) && lc.entry > 0) {
+      const tpp = lc.entry * (1 + (lc.tp || DEF_TP) / 100), slp = lc.entry * (1 - (lc.sl || DEF_SL) / 100);
+      hline(tpp, '#ef4b5b', [6, 4], '#' + n + ' 익절 +' + (lc.tp || DEF_TP) + '%', 0.4);
+      hline(slp, '#3b82f6', [6, 4], '#' + n + ' 손절 -' + (lc.sl || DEF_SL) + '%', 0.4);
+      hline(lc.entry, '#ffd166', [3, 3], '#' + n + ' 진입 ' + md(lc.entryDate) + ' ' + fmt(lc.entry), 0.55);
+    }
   }
 
   // 캔들
@@ -1344,32 +1514,44 @@ function draw() {
     ctx.fillText(vb[i][0].slice(5), X(i), h - 5);
   }
 
+  // 매매 마커: 이 종목에서 한 모든 매수(▲B)·청산(●S) — 기록된 매매 + 지금 보유 중인 포지션
+  const marks = tradeMarks(vb);
+  const manyMarks = marks.length > 1;
+
   // 청산 마커
-  if (exitTf >= i0 && exitTf <= rEdge) {
-    const ex = X(exitTf), ey = y(pos.exit);
-    const col = pos.kind === 'tp' ? '#37d67a' : (pos.kind === 'sl' ? '#8fb8ff' : (pos.kind === 'manual' ? '#ffd166' : '#cfd6e2'));
+  marks.forEach(function (m) {
+    if (m.exit == null || m.exitTf < i0 || m.exitTf > rEdge) return;
+    const ex = X(m.exitTf), ey = y(m.exit);
+    if (ey < padT - 2 || ey > padT + priceH + 2) return;
+    const col = m.kind === 'tp' ? '#37d67a' : (m.kind === 'sl' ? '#8fb8ff' : (m.kind === 'manual' ? '#ffd166' : '#cfd6e2'));
     ctx.beginPath(); ctx.arc(ex, ey, 5, 0, Math.PI * 2);
     ctx.fillStyle = col; ctx.fill();
     ctx.strokeStyle = '#0b0e13'; ctx.lineWidth = 1.5; ctx.stroke();
-    const lab = pos.kind === 'tp' ? '익절' : (pos.kind === 'sl' ? '손절' : (pos.kind === 'manual' ? '매도' : '종료'));
+    const lab = m.kind === 'tp' ? '익절' : (m.kind === 'sl' ? '손절' : (m.kind === 'manual' ? '매도' : '종료'));
     ctx.font = '700 10px -apple-system,sans-serif';
     ctx.textAlign = 'center';
     const lx = Math.max(padL + 14, Math.min(padL + plotW - 14, ex));
     ctx.fillStyle = col;
-    ctx.fillText('S ' + lab + ' ' + sp(pos.ret), lx, ey < padT + 30 ? ey + 16 : ey - 9);
-  }
+    ctx.fillText('S ' + lab + ' ' + sp(m.ret) + (manyMarks ? ' #' + m.no : ''), lx, ey < padT + 30 ? ey + 16 : ey - 9);
+  });
 
   // 매수 마커 (▲B)
-  if (state.decision === 'buy' && entryTf >= i0 && entryTf <= rEdge) {
-    const bx = X(entryTf);
-    const by = Math.max(padT + 11, Math.min(padT + priceH - 3, y(vb[entryTf][3]) + 16));
+  marks.forEach(function (m) {
+    if (m.entryTf < i0 || m.entryTf > rEdge) return;
+    const bx = X(m.entryTf);
+    const by = Math.max(padT + 11, Math.min(padT + priceH - 3, y(vb[m.entryTf][3]) + 16));
     ctx.font = '800 10px -apple-system,sans-serif';
     ctx.textAlign = 'center';
     ctx.fillStyle = '#0b0e13';
     ctx.fillRect(bx - 8, by - 9, 16, 13);
+    if (manyMarks) ctx.fillRect(bx - 9, by - 24, 18, 12);
     ctx.fillStyle = '#ffd166';
     ctx.fillText('▲B', bx, by + 1);
-  }
+    if (manyMarks) {
+      ctx.font = '700 9px -apple-system,sans-serif';
+      ctx.fillText('#' + m.no, bx, by - 14);
+    }
+  });
 
   // 포지션 라벨
   lines.sort(function (a, b) { return a.y - b.y; });
@@ -1907,13 +2089,23 @@ function hintText() {
     startJumpNotice = '';
     return '<b>' + t + '</b>부터 시작합니다. 바로 <b>이 날 매수</b>를 누르거나 <b>+1일</b>로 하루씩 넘기세요.';
   }
+  const trs = curTrades();
+  if (trs.length) {
+    const last = trs[trs.length - 1];
+    if (last.decision === 'pass') {
+      return '이 문제는 ' + md(last.entryDate) + ' <b>관망</b>으로 마쳤습니다. <b>+1일</b>로 이후 흐름(기회비용)을 확인하세요.';
+    }
+    const cu = tradeCum(state.records[cur().id]);
+    return '#' + trs.length + ' 매매가 <b>' + md(last.exitDate) + '</b> 청산됐습니다(' + sp(last.ret) + '). 이 종목 합산 <b class="' + cls(cu.cum) + '">' + sp(cu.cum) + '</b>. ' +
+      '이 날(' + md(cur().bars[ci][0]) + ') 종가로 <b>다시 매수</b>하거나 <b>+1일</b>로 다음 날을 열어 이어서 매매할 수 있습니다.';
+  }
   const sRel = startRelOf(scn);
   const startTxt = (sRel === -START_BACK) ? '기준일 2거래일 전' : '시작일 <b>' + ddayTxt(sRel) + '</b>';
   const nowTxt = state.step > 0
     ? ' 지금은 <b>' + scn.bars[ci][0] + '</b>(' + ddayTxt(ci - scn.dIndex) + ')까지 열었습니다.'
     : '';
   return startTxt + ' (<b>' + scn.bars[startIdxOf(scn)][0] + '</b>)부터 시작합니다.' + nowTxt +
-    ' 차트를 좌우로 밀어 과거를 보고, <b>+1일</b>로 하루씩 넘기다가 원하는 날 <b>이 날 매수</b>를 누르세요.';
+    ' 차트를 좌우로 밀어 과거를 보고, <b>+1일</b>로 하루씩 넘기다가 원하는 날 <b>이 날 매수</b>를 누르세요. 청산 뒤에도 <b>이 날 다시 매수</b>로 이어서 매매할 수 있습니다.';
 }
 function renderHint(extra) {
   const el = $('hint');
@@ -1938,7 +2130,11 @@ function renderDecisionUI() {
     $('entryPrice').innerHTML = '<b>' + won(baseEntry()) + '</b> · ' + cur().bars[curIdx()][0] + ' 종가';
   }
   const bs = $('buySub'), ps = $('passSub');
-  if (bs) bs.textContent = cur().bars[curIdx()][0] + ' 종가로 진입 — 익절·손절 함께 설정';
+  const trs = curTrades();
+  const lbl = $('buyLbl');
+  if (lbl) lbl.textContent = (trs.length && !state.decision) ? '이 날 다시 매수' : '이 날 매수';
+  if (bs) bs.textContent = cur().bars[curIdx()][0] + ' 종가로 진입 — 익절·손절 함께 설정' +
+    (trs.length ? ' · 이 종목 ' + (trs.length + 1) + '번째 매매' : '');
   if (ps) ps.textContent = cur().bars[curIdx()][0] + '은 사지 않는다 — 이후 흐름만 본다';
 }
 
@@ -1977,10 +2173,30 @@ function reasonLine(r) {
 
 function renderStatus() {
   const el = $('status');
-  if (!state.decision) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  const trs = curTrades();
+  if (!state.decision) {
+    if (!trs.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    const last = trs[trs.length - 1];
+    const cu = tradeCum(state.records[cur().id]);
+    if (last.decision === 'pass') {
+      el.innerHTML = '<span class="b pass">관망</span>' +
+        '<span>' + md(last.entryDate) + ' 관망 · 이후 ' + sp(last.opp) + '</span>' +
+        '<span class="meta">이 문제는 관망으로 마쳤습니다</span>';
+      el.style.display = 'flex';
+      return;
+    }
+    const kc = last.kind === 'tp' ? 'tp' : (last.kind === 'sl' ? 'sl' : (last.kind === 'manual' ? 'hold' : 'end'));
+    const kt = last.kind === 'tp' ? '익절 청산' : (last.kind === 'sl' ? '손절 청산' : (last.kind === 'manual' ? '수동 청산' : '기간 종료'));
+    el.innerHTML = '<span class="b ' + kc + '">#' + trs.length + ' ' + kt + '</span>' +
+      '<span>' + md(last.exitDate) + ' · ' + last.held + '거래일 보유 · ' + won(last.exit) + ' · <b class="' + cls(last.ret) + '">' + sp(last.ret) + '</b></span>' +
+      '<span class="meta">이 종목 합산 <b class="' + cls(cu.cum) + '">' + sp(cu.cum) + '</b> (' + cu.buys + '회 매수) · ' + md(cur().bars[curIdx()][0]) + ' 종가로 다시 살 수 있습니다</span>';
+    el.style.display = 'flex';
+    return;
+  }
   const r = live();
   const techTxt = state.tech || '기법 미지정';
   const setTxt = '익절 +' + state.tp + '% / 손절 -' + state.sl + '%';
+  const nth = trs.length + 1;
   let html = '';
   if (state.decision === 'pass') {
     html = '<span class="b pass">관망</span>' +
@@ -1995,7 +2211,7 @@ function renderStatus() {
       '<span class="meta">' + techTxt + ' · ' + setTxt + '</span>';
   } else {
     const now = r.lastClose / r.entry - 1;
-    html = '<span class="b hold">보유 중</span>' +
+    html = '<span class="b hold">' + (trs.length ? '#' + nth + ' 보유 중' : '보유 중') + '</span>' +
       '<span>' + r.held + '거래일째 · 현재 ' + won(r.lastClose) + ' <b class="' + cls(now) + '">' + sp(now) + '</b></span>' +
       '<span class="meta">' + md(r.entryDate) + ' 매수 ' + won(r.entry) + ' · ' + techTxt + ' · ' + setTxt + '</span>';
   }
@@ -2022,46 +2238,99 @@ function renderButtons() {
 }
 
 /* ================= 결과 ================= */
+/* 결과 영역에 보여 줄 매매 한 건
+   - 보유 중·관망이면 지금 상태(live)
+   - 청산했으면 방금 청산한 매매(없으면 저장된 마지막 매매) */
+function tradeView() {
+  if (state.decision === 'buy') {
+    const r = live();
+    return { r: r, tech: state.tech, tp: state.tp, sl: state.sl, done: (r.exit != null) };
+  }
+  if (state.decision === 'pass') {
+    const r = live();
+    return { r: r, tech: state.tech, tp: state.tp, sl: state.sl, done: true };
+  }
+  const t = state.lastClosed || recLastTrade(state.records[cur().id]);
+  if (!t) return null;
+  return { r: t, tech: t.tech, tp: t.tp, sl: t.sl, done: (t.decision === 'pass' || t.exit != null) };
+}
+
+/* 이 종목에서 한 매매를 #1, #2 … 로 모은 표 (결과 영역 하단) */
+function tradesBlock() {
+  const scn = cur();
+  const trs = curTrades();
+  if (!trs.length) return '';
+  const cu = tradeCum(state.records[scn.id]);
+  const cap = state.capital || DEF_CAP;
+  let profit = 0;
+  trs.forEach(function (t) { if (t.decision === 'buy') profit += (t.ret || 0) * cap; });
+  let h = '<div class="resbox tbox">' +
+    '<div class="reshead"><b>이 종목 매매 내역</b>' +
+    '<span class="meta">' + trs.length + '건 · 합산 <b class="' + cls(cu.cum) + '">' + sp(cu.cum) + '</b> · ' + wonS(profit) + '</span></div>' +
+    '<div class="tw"><table class="rt"><tr><th>#</th><th>기법</th><th>매수 → 청산</th><th>가격</th><th>수익률</th><th>보유</th><th>결과</th></tr>';
+  trs.forEach(function (t, i) {
+    const isBuy = t.decision === 'buy';
+    const when = isBuy
+      ? (md(t.entryDate) + ' → ' + (t.exitDate ? md(t.exitDate) : '보유 중'))
+      : (md(t.entryDate) + ' 관망');
+    const price = ((t.entry == null ? '-' : fmt(t.entry)) + ' → ' + (isBuy ? (t.exit == null ? '-' : fmt(t.exit)) : '-'));
+    const ret = isBuy ? '<span class="' + cls(t.ret) + '">' + sp(t.ret) + '</span>' : '<span class="flat">-</span>';
+    const k = isBuy ? (KIND_LABEL[t.kind] || '청산') : '관망';
+    h += '<tr><td class="nm">#' + (i + 1) + '</td><td>' + (isBuy ? (t.tech || '미지정') : '-') + '</td>' +
+      '<td>' + when + '</td><td>' + price + '</td><td>' + ret + '</td>' +
+      '<td>' + (isBuy ? (t.held || 0) + '일' : '-') + '</td>' +
+      '<td><span class="tagres ' + (isBuy ? t.kind : 'pass') + '">' + k + '</span></td></tr>';
+  });
+  h += '</table></div></div>';
+  return h;
+}
+
 function showResult() {
   const scn = cur(), res = $('result');
-  if (!state.decision) { res.style.display = 'none'; res.innerHTML = ''; return; }
-  const lv = live();
-  const isBuy = state.decision === 'buy';
-  const finished = isBuy ? (lv.exit != null) : (lv.revealed > 0);
-  if (!finished) { res.style.display = 'none'; res.innerHTML = ''; return; }
-
-  const techTxt = state.tech || '미지정';
-  const entryRel = lv.entryIdx - scn.dIndex;
+  const v = tradeView();
+  const tb = tradesBlock();
+  if (!v || !v.done) {
+    if (tb) { res.style.display = 'block'; res.innerHTML = tb; return; }
+    res.style.display = 'none'; res.innerHTML = '';
+    return;
+  }
+  const r = v.r;
+  const isBuy = (r.decision !== 'pass');
+  const techTxt = v.tech || '미지정';
+  const entryRel = r.entryIdx - scn.dIndex;
+  const tpTxt = (v.tp == null ? DEF_TP : v.tp), slTxt = (v.sl == null ? DEF_SL : v.sl);
   let badge = '', bigTxt = '', bigCls = 'flat', title = '', mainKV = '', sideBox = '';
 
   if (isBuy) {
-    const kt = lv.kind === 'tp' ? '익절 청산' : (lv.kind === 'sl' ? '손절 청산' : (lv.kind === 'manual' ? '수동 청산' : '기간 종료'));
-    badge = '<span class="resbadge ' + lv.kind + '">' + kt + '</span>';
-    title = '<b>내 매매 결과</b><span class="meta">' + techTxt + ' · 익절 +' + state.tp + '% / 손절 -' + state.sl + '%</span>';
-    bigTxt = sp(lv.ret);
-    bigCls = cls(lv.ret);
+    const kt = r.kind === 'tp' ? '익절 청산' : (r.kind === 'sl' ? '손절 청산' : (r.kind === 'manual' ? '수동 청산' : '기간 종료'));
+    badge = '<span class="resbadge ' + r.kind + '">' + kt + '</span>';
+    title = '<b>내 매매 결과</b><span class="meta">' + techTxt + ' · 익절 +' + tpTxt + '% / 손절 -' + slTxt + '%</span>';
+    bigTxt = sp(r.ret);
+    bigCls = cls(r.ret);
     mainKV = '<div class="kv">' +
-      '<span>진입</span><span>' + won(lv.entry) + ' · ' + lv.entryDate + ' 종가 <span class="meta">(' + ddayTxt(entryRel) + ')</span></span>' +
-      '<span>청산</span><span>' + won(lv.exit) + ' · ' + lv.exitDate + ' (' + (lv.kind === 'tp' ? '익절' : (lv.kind === 'sl' ? '손절' : (lv.kind === 'manual' ? '수동 매도' : '기간 종료'))) + ')</span>' +
-      '<span>보유</span><span>' + lv.held + '거래일</span>' +
-      '<span>방식</span><span>' + reasonLine(lv) + '</span>' +
+      '<span>진입</span><span>' + won(r.entry) + ' · ' + r.entryDate + ' 종가 <span class="meta">(' + ddayTxt(entryRel) + ')</span></span>' +
+      '<span>청산</span><span>' + won(r.exit) + ' · ' + r.exitDate + ' (' + (r.kind === 'tp' ? '익절' : (r.kind === 'sl' ? '손절' : (r.kind === 'manual' ? '수동 매도' : '기간 종료'))) + ')</span>' +
+      '<span>보유</span><span>' + r.held + '거래일</span>' +
+      '<span>방식</span><span>' + reasonLine(r) + '</span>' +
       '</div>';
     sideBox = '<div class="box"><h4>보유 중 최고 / 최저</h4>' +
-      '<div class="kv"><span>최고</span><span class="' + cls(lv.mfe) + '">' + sp(lv.mfe) + '</span>' +
-      '<span>최저</span><span class="' + cls(lv.mae) + '">' + sp(lv.mae) + '</span></div>' +
+      '<div class="kv"><span>최고</span><span class="' + cls(r.mfe) + '">' + sp(r.mfe) + '</span>' +
+      '<span>최저</span><span class="' + cls(r.mae) + '">' + sp(r.mae) + '</span></div>' +
       '<div class="meta">내 익절·손절선까지 얼마나 여유가 있었는지 보세요.</div></div>';
   } else {
+    const rev = (r.revealed == null ? 0 : r.revealed);
+    const lastClose = (r.lastClose == null ? r.entry : r.lastClose);
     badge = '<span class="resbadge pass">관망</span>';
     title = '<b>내 매매 결과</b><span class="meta">진입하지 않음 · 수익 0%</span>';
     bigTxt = '0.0%';
     bigCls = 'flat';
     mainKV = '<div class="kv">' +
-      '<span>관망일 종가</span><span>' + won(lv.entry) + ' · ' + lv.entryDate + ' <span class="meta">(' + ddayTxt(entryRel) + ')</span></span>' +
-      '<span>이후</span><span>' + lv.revealed + '거래일 · 최종 종가 ' + won(lv.lastClose) + '</span>' +
+      '<span>관망일 종가</span><span>' + won(r.entry) + ' · ' + r.entryDate + ' <span class="meta">(' + ddayTxt(entryRel) + ')</span></span>' +
+      '<span>이후</span><span>' + rev + '거래일 · 최종 종가 ' + won(lastClose) + '</span>' +
       '</div>';
     sideBox = '<div class="box"><h4>기회비용</h4>' +
-      '<div class="big ' + cls(lv.opp) + '">' + sp(lv.opp) + '</div>' +
-      '<div class="meta">최고 ' + sp(lv.mfe) + ' / 최저 ' + sp(lv.mae) + '</div></div>';
+      '<div class="big ' + cls(r.opp) + '">' + sp(r.opp) + '</div>' +
+      '<div class="meta">최고 ' + sp(r.mfe) + ' / 최저 ' + sp(r.mae) + '</div></div>';
   }
 
   const isScan = scn.kind === 'scan';
@@ -2084,6 +2353,7 @@ function showResult() {
         sideBox +
       '</div>' +
     '</div>' +
+    tb +
     '<div class="refbox">' +
       '<div class="refhead"><span class="stancetag ' + stanceCls + '">' + stanceTxt + '</span>' +
       '<span class="meta">채점이 아니라 내 판단과 비교해 보는 참고 자료입니다.</span></div>' +
@@ -2109,6 +2379,8 @@ function resetStateFor() {
   state.sl = state.prefs.sl || DEF_SL;
   state.pan = 0;
   state.restored = false;
+  state.recorded = false;
+  state.lastClosed = null;
   startJumpNotice = '';
 }
 
@@ -2167,17 +2439,22 @@ function renderScenario(i) {
 
   const rec = state.records[scn.id];
   if (rec) {
-    state.decision = rec.decision;
-    state.tech = rec.tech || null;
-    if (isFinite(rec.tp) && rec.tp > 0) state.tp = rec.tp;
-    if (isFinite(rec.sl) && rec.sl > 0) state.sl = rec.sl;
-    state.step = maxStepOf(scn);
-    const ei = (rec.entryIdx == null) ? scn.dIndex : rec.entryIdx;
-    if (rec.decision === 'buy') {
-      state.buyIdx = ei;
-      state.sellIdx = (rec.sellIdx == null) ? null : rec.sellIdx;
-    } else {
-      state.passIdx = ei;
+    const trs = recTrades(rec);
+    const last = trs.length ? trs[trs.length - 1] : null;
+    if (last) {
+      state.tech = last.tech || null;
+      if (isFinite(last.tp) && last.tp > 0) state.tp = last.tp;
+      if (isFinite(last.sl) && last.sl > 0) state.sl = last.sl;
+      // 마지막 매매를 청산한 봉(관망이면 그 봉)까지 열어 두고, 곧바로 다시 살 수 있게 둔다
+      const back = (last.exitIdx != null) ? last.exitIdx : (last.entryIdx != null ? last.entryIdx : startIdxOf(scn));
+      state.step = Math.max(0, Math.min(maxStepOf(scn), back - startIdxOf(scn)));
+      state.lastClosed = last;
+      if (last.decision === 'pass') {
+        state.decision = 'pass';
+        state.passIdx = last.entryIdx;
+        state.recorded = true;               // 같은 관망 기록을 다시 쓰지 않는다
+        state.step = maxStepOf(scn);          // 관망은 이후 흐름까지 열어 둔다
+      }
     }
     state.restored = true;
   }
@@ -2186,6 +2463,7 @@ function renderScenario(i) {
   renderHint();
   renderStatus();
   renderButtons();
+  renderOriginBtn();
   showResult();
   renderList();
   hideTip();
@@ -2195,8 +2473,14 @@ function renderScenario(i) {
 function openBuy() {
   if (!loaded(cur())) { showLoadGuard(); return; }
   if (state.decision) return;
-  if (curIdx() >= lastBarIdx()) {
-    renderHint('마지막으로 열린 봉입니다. 더 볼 봉이 없어 매수할 수 없습니다 — <b>패스(관망)</b>로 기록하세요.');
+  const ci = curIdx();
+  if (ci >= lastBarIdx()) {
+    renderHint('마지막으로 열린 봉입니다. 더 볼 봉이 없어 매수할 수 없습니다 — <b>패스(관망)</b>로 기록하거나 <b>다시 풀기</b>로 시작일을 옮기세요.');
+    return;
+  }
+  const floor = nextBuyFloor();
+  if (floor >= 0 && ci < floor) {
+    renderHint('직전 매매를 청산한 <b>' + cur().bars[floor][0] + '</b> 이후 날에서 다시 살 수 있습니다. <b>+1일</b>로 그 날까지 넘겨 주세요.');
     return;
   }
   state.panel = true;
@@ -2218,10 +2502,14 @@ function confirmBuy() {
   if (!isFinite(tp) || tp <= 0 || tp > 50) { renderHint('목표 익절 %를 0.5~50 사이로 입력해 주세요.'); syncNums(); return; }
   if (!isFinite(sl) || sl <= 0 || sl > 50) { renderHint('손절 %를 0.5~50 사이로 입력해 주세요.'); syncNums(); return; }
   if (curIdx() >= lastBarIdx()) { renderHint('마지막으로 열린 봉입니다. 더 볼 봉이 없어 매수할 수 없습니다.'); return; }
+  const floor = nextBuyFloor();
+  if (floor >= 0 && curIdx() < floor) { renderHint('직전 매매를 청산한 날 이후에서 다시 살 수 있습니다.'); return; }
   state.tp = Math.round(tp * 10) / 10;
   state.sl = Math.round(sl * 10) / 10;
   state.decision = 'buy';
   state.buyIdx = curIdx();
+  state.sellIdx = null;
+  state.recorded = false;
   state.panel = false;
   state.prefs = { tp: state.tp, sl: state.sl };
   renderDecisionUI();
@@ -2237,6 +2525,7 @@ function decidePass() {
   state.decision = 'pass';
   state.passIdx = curIdx();
   state.panel = false;
+  state.recorded = false;
   maybeRecord();
   renderDecisionUI();
   renderHint();
@@ -2254,7 +2543,8 @@ function sellNow() {
     return;
   }
   state.sellIdx = ci;
-  maybeRecord();
+  finishTrade();                      // 기록하고 다시 살 수 있는 상태로
+  renderDecisionUI();
   renderHint();
   renderStatus();
   renderButtons();
@@ -2274,7 +2564,7 @@ function step() {
   state.pan = 0;                       // 새 봉이 열리면 최신 봉으로
   if (state.decision === 'buy') {
     const r = live();
-    if (r.exit != null) maybeRecord();
+    if (r.exit != null) finishTrade();
   } else if (state.decision === 'pass') {
     maybeRecord();
   }
@@ -2289,7 +2579,7 @@ function step() {
 
 function revealAll() {
   if (!loaded(cur())) { showLoadGuard(); return; }
-  if (!state.decision) {
+  if (!state.decision && !curTrades().length) {
     if (state.panel) { renderHint('매수 설정 중입니다. <b>매수 확정</b> 또는 <b>취소</b>를 먼저 눌러 주세요.'); return; }
     renderHint('먼저 <b>이 날 매수</b> 또는 <b>패스(관망)</b>를 골라 주세요.');
     return;
@@ -2298,8 +2588,8 @@ function revealAll() {
   state.pan = 0;
   if (state.decision === 'buy') {
     const r = live();
-    if (r.exit != null) maybeRecord();
-  } else {
+    if (r.exit != null) finishTrade();
+  } else if (state.decision === 'pass') {
     maybeRecord();
   }
   renderDecisionUI();
@@ -2338,6 +2628,60 @@ function next() {
   if (window.scrollTo) window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+/* ================= 종산 원본 차트 보기 =================
+   data/{id}.json 의 imgs(종산 블로그 원본 차트 이미지 URL)와 postText(본문 발췌)를 모달로 크게 보여 준다.
+   네이버 블로그 이미지는 핫링크 차단이 걸릴 수 있어 <img referrerpolicy="no-referrer"> 로 불러오고,
+   실패하면 원문 블로그 링크를 안내한다. */
+function curImgs() { const s = cur(); return (s && s.imgs && s.imgs.length) ? s.imgs : null; }
+function renderOriginBtn() {
+  const b = $('btnOrigin');
+  if (!b) return;
+  b.style.display = curImgs() ? 'inline-block' : 'none';
+}
+function escH(t) {
+  return String(t == null ? '' : t)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+function bindOriginImgs() {
+  const box = $('originBody');
+  if (!box || !box.querySelectorAll) return;
+  let nodes = [];
+  try { nodes = box.querySelectorAll('img'); } catch (e) { return; }
+  for (let i = 0; i < nodes.length; i++) {
+    nodes[i].onerror = function () {
+      if (this.parentNode && this.parentNode.classList) this.parentNode.classList.add('bad');
+      const f = $('originFail');
+      if (f) f.style.display = 'block';
+    };
+  }
+}
+function openOrigin() {
+  const s = cur();
+  const imgs = curImgs();
+  if (!imgs) return;
+  const src = s.source || {};
+  $('originTitle').textContent = s.name + ' · ' + s.d + ' 종산 원본 차트';
+  const link = $('originLink');
+  if (link) link.href = src.url || 'https://blog.naver.com/kokomo6661';
+  let h = '';
+  imgs.forEach(function (u, i) {
+    h += '<figure><img src="' + escH(u) + '" referrerpolicy="no-referrer" loading="lazy" decoding="async" alt="' +
+      escH(s.name) + ' 종산 원본 차트 ' + (i + 1) + '"><figcaption>' + escH(s.name) + ' 차트 ' + (i + 1) + '/' + imgs.length +
+      ' · ' + escH(src.date || s.d) + ' 글에서</figcaption></figure>';
+  });
+  if (s.postText) h += '<div class="otext">' + escH(s.postText) + '</div>';
+  $('originBody').innerHTML = h;
+  const fail = $('originFail');
+  if (fail) fail.style.display = 'none';
+  bindOriginImgs();
+  $('originModal').classList.add('on');
+}
+function closeOrigin() {
+  const m = $('originModal');
+  if (m) m.classList.remove('on');
+}
+
 /* ================= 이벤트 ================= */
 function bind() {
   $('btnBuy').onclick = openBuy;
@@ -2374,6 +2718,9 @@ function bind() {
   $('btnHelp').onclick = function () { $('help').classList.add('on'); };
   $('helpClose').onclick = function () { $('help').classList.remove('on'); };
   $('help').onclick = function (e) { if (e.target && e.target.id === 'help') $('help').classList.remove('on'); };
+  if ($('btnOrigin')) $('btnOrigin').onclick = openOrigin;
+  if ($('originClose')) $('originClose').onclick = closeOrigin;
+  if ($('originModal')) $('originModal').onclick = function (e) { if (e.target && e.target.id === 'originModal') closeOrigin(); };
   $('techModal').onclick = function (e) { if (e.target && e.target.id === 'techModal') $('techModal').classList.remove('on'); };
   $('btnReset').onclick = function () {
     if (!confirm('저장된 기록(진행도·승률·누적 수익률)을 모두 지울까요?')) return;
