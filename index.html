@@ -999,6 +999,9 @@ function draw() {
       hline(pos.slPrice, '#3b82f6', [6, 4], '손절 -' + state.sl + '%  ' + fmt(pos.slPrice), 1);
       hline(entryP, '#ffd166', [3, 3], (state.decision === 'buy' ? '진입 ' : '매수 예상 ') + md(pos.entryDate) + ' ' + fmt(entryP), state.decision ? 1 : 0.7);
     } else if (state.decision === 'buy') {
+      // 청산 뒤에도 내 익절·손절선은 흐리게 남긴다
+      hline(pos.tpPrice, '#ef4b5b', [6, 4], '익절 +' + state.tp + '%  ' + fmt(pos.tpPrice), 0.5);
+      hline(pos.slPrice, '#3b82f6', [6, 4], '손절 -' + state.sl + '%  ' + fmt(pos.slPrice), 0.5);
       hline(entryP, '#ffd166', [3, 3], '진입 ' + md(pos.entryDate) + ' ' + fmt(entryP), 0.85);
     }
     if (state.decision === 'pass') {
@@ -1241,6 +1244,7 @@ function clampPan(v) {
 }
 function setPan(v, silent) {
   state.pan = clampPan(v);
+  hideTip();
   if (!silent) draw();
 }
 function zoomBy(dir) {
