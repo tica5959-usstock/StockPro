@@ -1587,7 +1587,9 @@ function applyStartDate() {
 
 /* ================= 크로스헤어 ================= */
 const tip = $('tip');
-function showTip(ev) {
+let tipIdx = -1;          // 지금 툴팁이 가리키는 봉
+let tipTapIdx = -1;       // 마지막으로 탭한 봉 — [이 날부터 시작] 버튼의 대상
+function showTip(ev, tapped) {
   if (!geom) return;
   const bars = geom.bars;
   const rect = cv.getBoundingClientRect();
@@ -1596,6 +1598,8 @@ function showTip(ev) {
   const i = Math.round(idxF);
   if (i < geom.i0 || i > geom.ci) { hideTip(); return; }
   const b = bars[i];
+  tipIdx = i;
+  if (tapped) tipTapIdx = i;
   const prev = bars[i - 1];
   const ch = prev ? (b[4] / prev[4] - 1) : null;
   const u = tfUnit();
@@ -1623,7 +1627,7 @@ function showTip(ev) {
   lx = Math.max(2, lx);
   tip.style.left = lx + 'px';
   tip.style.top = ly + 'px';
-  renderTipStart(i);
+  renderTipStart();
 
   draw();
   ctx.save();
@@ -1631,7 +1635,7 @@ function showTip(ev) {
   ctx.beginPath(); ctx.moveTo(geom.X(i), geom.padT); ctx.lineTo(geom.X(i), geom.volT + geom.volH); ctx.stroke();
   ctx.restore();
 }
-function hideTip() { tip.style.display = 'none'; hideTipStart(); }
+function hideTip() { tip.style.display = 'none'; tipIdx = -1; tipTapIdx = -1; hideTipStart(); }
 
 /* ================= 툴팁의 [YY-MM-DD부터 시작] =================
    일봉에서 과거 봉을 탭하면 그 봉 날짜로 시작일을 바로 옮긴다.
@@ -1659,10 +1663,12 @@ function tipStartLabel(i) {
   if (state.records[s.id]) return { txt: d.slice(2) + '부터 시작 · 초기화 필요', cls: ' rec' };
   return { txt: d.slice(2) + '부터 시작', cls: '' };
 }
-/* 툴팁 바로 아래(자리가 없으면 위)에 작은 플로팅 버튼을 띄운다 */
-function renderTipStart(i) {
+/* 차트 왼쪽 아래에 작은 플로팅 버튼 — 마지막으로 '탭한' 봉의 날짜로 시작일을 옮긴다.
+   마우스를 옴겨 툴팁이 다른 봉을 보여 줘도 버튼의 날짜는 탭한 봉 그대로 둔다. */
+function renderTipStart() {
   const el = tipStartEl();
   if (!el) return;
+  const i = tipTapIdx;
   if (!canJumpStart(i)) { hideTipStart(); return; }
   const s = cur(), lab = tipStartLabel(i), same = (i === startIdxOf(s));
   el.className = 'tipstart' + lab.cls;
@@ -1841,7 +1847,7 @@ function onPointerUp(e) {
   if (!drag) return;
   const d = drag;
   drag = null;
-  if (!d.moved && !pinchUsed) { showTip(e); return; }
+  if (!d.moved && !pinchUsed) { showTip(e, true); return; }
   state.pan = Math.round(state.pan);
   hideTip();
   draw();
