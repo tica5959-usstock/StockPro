@@ -91,7 +91,7 @@ main{display:grid;grid-template-columns:250px 1fr;gap:14px;margin-top:12px}
 .startpop .splab{display:block;font-size:11px;color:var(--mut);margin-bottom:6px;font-weight:600}
 .startpop .splab em{font-style:normal;font-size:10px;color:#6d7a8c;margin-left:4px;font-weight:400}
 .startpop .sprow+.sprow{margin-top:9px}
-.startpop input#startDate{padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:#0f141b;color:var(--tx);font-size:14px;font-family:inherit;color-scheme:dark}
+.startpop input#startDate{width:152px;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:#0f141b;color:var(--tx);font-size:14px;font-family:inherit;color-scheme:dark}
 .startpop .spmeta{margin-top:9px;font-size:10.5px;color:var(--mut);line-height:1.5}
 .startpop .spmeta b{color:#ffd166;font-variant-numeric:tabular-nums}
 .startpop .spwarn{display:none;margin-top:9px;gap:8px;align-items:center;flex-wrap:wrap;font-size:11px;color:#ffd08a;background:#221a10;border:1px solid #6b4a16;border-radius:9px;padding:7px 9px}
@@ -1168,6 +1168,17 @@ function draw() {
     ctx.fillStyle = '#6d7a8c'; ctx.textAlign = 'left';
   }
 
+  // 시작일 세로선 (이 봉 전에는 +1일로 넘어가지 않는다)
+  const startTf = tfIndexOf(vb, scn.bars[startIdxOf(scn)][0]);
+  if (startTf >= 0 && startTf >= i0 && startTf <= rEdge) {
+    const sx = X(startTf);
+    ctx.save(); ctx.setLineDash([2, 4]); ctx.strokeStyle = '#7d8a9e'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(sx, padT + 10); ctx.lineTo(sx, volT + volH); ctx.stroke(); ctx.restore();
+    ctx.fillStyle = '#9aa8bc'; ctx.textAlign = 'center'; ctx.font = '10px -apple-system,sans-serif';
+    ctx.fillText('시작', Math.max(padL + 10, Math.min(padL + plotW - 10, sx)), volT + volH - 3);
+    ctx.fillStyle = '#6d7a8c'; ctx.textAlign = 'left';
+  }
+
   // 매수일 세로선
   if (state.decision === 'buy' && entryTf >= i0 && entryTf <= rEdge) {
     const bx = X(entryTf);
@@ -1773,7 +1784,7 @@ function hintText() {
   const nowTxt = state.step > 0
     ? ' 지금은 <b>' + scn.bars[ci][0] + '</b>(' + ddayTxt(ci - scn.dIndex) + ')까지 열었습니다.'
     : '';
-  return startTxt + '(<b>' + scn.bars[startIdxOf(scn)][0] + '</b>)부터 시작합니다.' + nowTxt +
+  return startTxt + ' (<b>' + scn.bars[startIdxOf(scn)][0] + '</b>)부터 시작합니다.' + nowTxt +
     ' 차트를 좌우로 밀어 과거를 보고, <b>+1일</b>로 하루씩 넘기다가 원하는 날 <b>이 날 매수</b>를 누르세요.';
 }
 function renderHint(extra) {
